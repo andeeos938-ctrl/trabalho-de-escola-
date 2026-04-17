@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Desafio 21 Dias | Profª Antonina</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@800&family=Outfit:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --green: #00ff88;
+            --overlay: rgba(0, 0, 0, 0.85);
+            --card-bg: rgba(20, 20, 20, 0.9);
+            --text: #ffffff;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
+
+        body {
+            background: url('https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&q=80&w=2070') no-repeat center center fixed;
+            background-size: cover;
+            color: var(--text);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .page-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--overlay);
+            z-index: 0;
+        }
+
+        nav {
+            width: 300px;
+            background: rgba(10, 10, 10, 0.95);
+            border-right: 2px solid var(--green);
+            display: flex;
+            flex-direction: column;
+            padding: 40px 25px;
+            position: fixed;
+            height: 100vh;
+            z-index: 10;
+        }
+
+        .logo-area { margin-bottom: 50px; text-align: center; }
+        .logo-area h1 { font-family: 'Big Shoulders Display'; font-size: 2.5rem; color: var(--green); line-height: 1; }
+        .logo-area p { font-size: 0.8rem; color: #888; letter-spacing: 2px; margin-top: 5px; }
+
+        .nav-btn {
+            background: transparent;
+            border: none;
+            color: #aaa;
+            padding: 18px;
+            border-radius: 15px;
+            text-align: left;
+            cursor: pointer;
+            font-weight: 700;
+            margin-bottom: 15px;
+            transition: 0.4s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-btn:hover, .nav-btn.active {
+            background: var(--green);
+            color: black;
+            transform: translateX(10px);
+        }
+
+        main {
+            margin-left: 300px;
+            flex: 1;
+            padding: 50px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .page { display: none; }
+        .page.active { display: block; animation: slideUp 0.6s ease-out; }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 30px;
+            padding: 40px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        select {
+            width: 100%;
+            padding: 18px;
+            background: #000;
+            color: var(--green);
+            border: 2px solid var(--green);
+            border-radius: 15px;
+            font-weight: 800;
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+        }
+
+        .chart-box { height: 450px; margin-top: 20px; }
+
+        .info-section {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+            margin-top: 25px;
+        }
+
+        .info-card {
+            background: rgba(0,255,136,0.08);
+            border: 1px solid rgba(0,255,136,0.2);
+            padding: 30px;
+            border-radius: 25px;
+        }
+
+        .info-card h3 {
+            color: var(--green);
+            margin-bottom: 15px;
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .info-card p {
+            font-size: 0.95rem;
+            color: #ddd;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .info-card ul {
+            padding-left: 20px;
+            color: #bbb;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .stat-big {
+            font-size: 4.5rem;
+            color: var(--green);
+            font-weight: 800;
+            text-align: center;
+        }
+
+        .label-small {
+            text-align: center;
+            display: block;
+            color: #777;
+            font-weight: 800;
+            letter-spacing: 2px;
+        }
+
+        .welcome-text { margin-bottom: 40px; }
+        .welcome-text h2 {
+            font-size: 3rem;
+            font-family: 'Big Shoulders Display';
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+
+        .highlight-list {
+            color: #ccc;
+            margin-top: 15px;
+            line-height: 2;
+            font-size: 1.05rem;
+        }
+
+        @media (max-width: 980px) {
+            nav { width: 100%; height: auto; position: relative; border-right: none; border-bottom: 2px solid var(--green); }
+            main { margin-left: 0; padding: 25px; }
+            body { flex-direction: column; }
+            .info-section { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="page-overlay"></div>
+
+    <nav>
+        <div class="logo-area">
+            <h1>VIDA SAUDÁVEL</h1>
+            <p>DESAFIO 21 DIAS</p>
+        </div>
+        <button class="nav-btn active" onclick="showPage('page1', this)">📊 Pesagem Comparativa</button>
+        <button class="nav-btn" onclick="showPage('page3', this)">📖 Guia do Desafio</button>
+        <div style="margin-top: auto; padding: 20px; border-top: 1px solid #333;">
+            <small style="color: #555;">PROFESSORA</small>
+            <div style="color: var(--green); font-weight: bold;">ANTONINA</div>
+        </div>
+    </nav>
+
+    <main>
+        <section id="page1" class="page active">
+            <div class="welcome-text">
+                <h2>Transformação em 21 Dias</h2>
+                <p>Resultados reais de quem decidiu mudar hábitos e assumir o controle da própria saúde.</p>
+            </div>
+            <div class="card">
+                <select id="userSelector" onchange="syncData(this.value)">
+                    <option value="p1">Participante 01</option>
+                    <option value="p2">Participante 02</option>
+                    <option value="p3">Participante 03</option>
+                    <option value="p4">Participante 04</option>
+                    <option value="p5">Participante 05</option>
+                    <option value="p6">Participante 06</option>
+                    <option value="p7">Participante 07</option>
+                    <option value="p8">Participante 08</option>
+                </select>
+                <div class="chart-box">
+                    <canvas id="mainColumnChart"></canvas>
+                </div>
+            </div>
+            <div class="info-section">
+                <div class="card">
+                    <span class="label-small">IMC ALCANÇADO</span>
+                    <div id="valImc" class="stat-big">--</div>
+                </div>
+                <div class="card">
+                    <span class="label-small">% GORDURA</span>
+                    <div id="valGord" class="stat-big">--</div>
+                </div>
+            </div>
+            <div class="card" style="text-align: center;">
+                <h3>Variação de Cintura</h3>
+                <p id="valCint" style="font-size: 2rem; color: var(--green); font-weight: bold; margin-top: 10px;"></p>
+            </div>
+        </section>
+
+        <section id="page3" class="page">
+            <div class="welcome-text">
+                <h2>Os 4 Pilares da Transformação</h2>
+                <p>Entenda a ciência por trás dos hábitos que transformaram o seu corpo nestes 21 dias.</p>
+            </div>
+
+            <div class="info-section">
+                <div class="info-card">
+                    <h3>💧 Hidratação Inteligente</h3>
+                    <p>A água é o principal veículo de transporte de nutrientes e oxigênio para as células. Sem ela, o metabolismo desacelera drasticamente.</p>
+                    <p>Durante o desafio, aprendemos que a queima de gordura (lipólise) exige moléculas de água para acontecer. Se você está desidratado, seu corpo retém líquido por segurança, causando inchaço.</p>
+                    <ul>
+                        <li><b>Meta Individual:</b> 35ml a 40ml por quilo corporal.</li>
+                        <li><b>Sinal de Alerta:</b> Se sentir sede, você já está desidratado.</li>
+                        <li><b>Benefício:</b> Melhora da função renal e controle da fome falsa.</li>
+                    </ul>
+                </div>
+
+                <div class="info-card">
+                    <h3>🍎 Nutrição Estratégica</h3>
+                    <p>Não é sobre comer menos, é sobre comer melhor. O foco foi a densidade nutricional: "Descascar mais e desembalar menos".</p>
+                    <p>Reduzimos o consumo de alimentos ultraprocessados para baixar a inflamação sistêmica e estabilizar a insulina, o hormônio que, em excesso, bloqueia a queima de gordura abdominal.</p>
+                    <ul>
+                        <li><b>Proteínas:</b> Essenciais para manter a massa muscular e gerar saciedade.</li>
+                        <li><b>Fibras:</b> Limpeza intestinal e controle do índice glicêmico.</li>
+                        <li><b>Açúcar:</b> O maior vilão da inflamação celular nestes 21 dias.</li>
+                    </ul>
+                </div>
+
+                <div class="info-card">
+                    <h3>😴 Recuperação Hormonal</h3>
+                    <p>O emagrecimento não acontece na academia, mas enquanto você dorme profundamente. É no sono que o corpo regula a Grelina (fome) e a Leptina (saciedade).</p>
+                    <p>A privação de sono eleva o Cortisol, o hormônio do estresse, que sinaliza ao corpo para estocar gordura como forma de proteção e aumenta o desejo por doces no dia seguinte.</p>
+                    <ul>
+                        <li><b>Janela Ideal:</b> Entre 7 a 9 horas de sono por noite.</li>
+                        <li><b>Higiene do Sono:</b> Desligar telas 30 minutos antes de dormir.</li>
+                        <li><b>O Processo:</b> É no estágio profundo que ocorre a reparação dos tecidos.</li>
+                    </ul>
+                </div>
+
+                <div class="info-card">
+                    <h3>🏋️ Movimento Constante</h3>
+                    <p>O exercício físico neste desafio funcionou como um interruptor metabólico. Mais do que queimar calorias na hora, ele sinaliza ao corpo para continuar gastando energia em repouso.</p>
+                    <p>A constância de se movimentar todos os dias fortalece a musculatura cardíaca e melhora a sensibilidade à insulina, permitindo que o corpo use a gordura estocada como fonte de energia.</p>
+                    <ul>
+                        <li><b>Força:</b> Protege as articulações e aumenta o gasto calórico basal.</li>
+                        <li><b>Cardio:</b> Melhora a oxigenação e a resistência física.</li>
+                        <li><b>Foco Mental:</b> Liberação de endorfina para combater a ansiedade alimentar.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card" style="margin-top: 30px; border-color: var(--green);">
+                <h2 style="color: var(--green); margin-bottom: 10px;">Conclusão da Professora Antonina</h2>
+                <p style="line-height: 1.8; color:#ddd;">
+                    Os resultados apresentados neste dashboard são fruto de disciplina e da aplicação rigorosa desses 4 pilares. 21 dias são suficientes para reprogramar seu paladar e sua mente. A transformação física que você vê nos gráficos é apenas o reflexo externo de um corpo que agora está desinflamado e funcionando em seu potencial máximo.
+                </p>
+                <p style="margin-top:20px; color:var(--green); font-weight:bold; text-align: center; font-size: 1.2rem;">
+                    "O hábito é o que te mantém no caminho. A disciplina é o que te faz chegar."
+                </p>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const db = {
+            p1: { peso: [65.0, 60.4], imc: 21.0, gord: 31.2, cint: "80cm → 77cm" },
+            p2: { peso: [113.0, 112.4], imc: 42.5, gord: 52.9, cint: "107cm → 101cm" },
+            p3: { peso: [68.7, 67.2], imc: 25.2, gord: 40.2, cint: "84cm → 82cm" },
+            p4: { peso: [54.8, 53.7], imc: 24.4, gord: 38.1, cint: "75cm → 68cm" },
+            p5: { peso: [55.0, 52.4], imc: 19.3, gord: 24.3, cint: "69cm → 70cm" },
+            p6: { peso: [65.8, 65.7], imc: 25.4, gord: 39.8, cint: "90cm → 84cm" },
+            p7: { peso: [47.9, 47.1], imc: 19.4, gord: 29.3, cint: "73cm → 69cm" },
+            p8: { peso: [58.9, 59.2], imc: 23.9, gord: 35.5, cint: "77cm → 74cm" }
+        };
+
+        let chartInst;
+        let currentID = "p1";
+
+        function showPage(id, btn) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            btn.classList.add('active');
+            syncData(currentID);
+        }
+
+        function syncData(uid) {
+            currentID = uid;
+            const user = db[uid];
+            document.getElementById('valImc').innerText = user.imc;
+            document.getElementById('valGord').innerText = user.gord + "%";
+            document.getElementById('valCint').innerText = user.cint;
+
+            if(chartInst) chartInst.destroy();
+            const ctx = document.getElementById('mainColumnChart').getContext('2d');
+            chartInst = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['INÍCIO', 'DIA 21'],
+                    datasets: [{
+                        data: user.peso,
+                        backgroundColor: ['#222', '#00ff88'],
+                        borderRadius: 20,
+                        barThickness: 80,
+                        borderColor: '#00ff88',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: false, min: Math.min(...user.peso) - 2, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#666' } },
+                        x: { grid: { display: false }, ticks: { color: '#fff', font: { weight: 'bold' } } }
+                    }
+                }
+            });
+        }
+        syncData('p1');
+    </script>
+</body>
+</html>
